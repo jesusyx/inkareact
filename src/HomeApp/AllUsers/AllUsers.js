@@ -82,10 +82,10 @@ class AllUsers extends Component {
         }
     }
     componentDidMount() {
-        db.collection('AdmUsuarios').get()
+        db.collection('usuarios').get()
         .then(Snapshot => {
             this.setState({
-                users:Snapshot.docs.map( doc => doc.data() )
+                users:Snapshot.docs
             })
         })
         .catch((error) =>{
@@ -97,7 +97,7 @@ class AllUsers extends Component {
         return(
             <Layout.Content style={{ margin: '24px 0 0', overflow: 'initial' }}>
                 <div style={{ margin:'0 0.5rem',background: '#fff', textAlign: 'center', marginBottom:'1rem' }}>
-                   <Table columns={columns} dataSource={this.state.users} scroll={{ x: 600 }}/>
+                   <Table columns={columns} dataSource={this.state.users.map( doc => doc.data())} scroll={{ x: 600 }}/>
                 </div>
             </Layout.Content>
         )

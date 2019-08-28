@@ -23,6 +23,7 @@ class Login extends Component {
                 <LoginRegister 
                     handleOnCreateEmail = {this.props.handleOnCreateEmail}
                     logintoggle = {this.logintoggle}
+                    
                 />
             )
             
@@ -31,6 +32,7 @@ class Login extends Component {
             <LoginForm
                 handleOnAuthEmail = {this.props.handleOnAuthEmail}
                 logintoggle = {this.logintoggle}
+                match = {this.props.match}
             />
             
         )

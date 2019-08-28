@@ -6,7 +6,6 @@ import { Route, Link } from 'react-router-dom';
 import AllCourses from './AllCourses/AllCourses'
 import AllUsers from './AllUsers/AllUsers'
 import NewUserForm from './NewUserForm/NewUserForm'
-import SingleCourse from './SingleCourse/SingleCourse'
 import CourseFiles from './CourseFiles/CourseFiles'
 import NuevoCursoForm from './NuevoCursoForm/NuevoCursoForm'
 
@@ -148,10 +147,12 @@ class HomeApp extends Component {
                   <Route exact path="/admin/usuarios/" render={()=>{
                     return (
                       <div style={{ marginTop: '1rem' }}>
-                        <PageHeader   title="Usuarios"
+                        <PageHeader   
+                                      key={'000'}
+                                      title="Usuarios"
                                       subTitle="Todos los usuarios"
                                       extra={[
-                                        <Link to="/admin/usuarios/nuevo">
+                                        <Link key='000' to="/admin/usuarios/nuevo">
                                           <Button type="default" size="default" >
                                             Nuevo usuario
                                           </Button>
@@ -168,7 +169,7 @@ class HomeApp extends Component {
                         <PageHeader   title="Cursos (3)"
                                       /* subTitle="Lista de Cursos" */
                                       extra={[
-                                        <Link to="/admin/cursos/nuevo">
+                                        <Link key='001' to="/admin/cursos/nuevo">
                                           <Button type="primary" size="default" >
                                             Nuevo Curso
                                           </Button>
@@ -179,7 +180,7 @@ class HomeApp extends Component {
                       </div>
                     )
                   }}/>
-                  <Route exact path="/admin/cursos/:idcurso" render={({match})=>{
+                  <Route  path="/admin/cursos/:idcurso" render={({match})=>{
                     if (match.url=="/admin/cursos/nuevo") {
                       return;
                     }else{
@@ -196,23 +197,7 @@ class HomeApp extends Component {
                     }
                     
                   }}/>
-                  <Route exact path="/admin/cursos/:idcurso/addnewfile" render={({match})=>{
-                    if (match.url=="/admin/cursos/nuevo") {
-                      return;
-                    }else{
-                      return (
-                        <div style={{ marginTop: '1rem' }}>
-                          {/* <SingleCourse
-                            match = {match}
-                          /> */}
-                          
-                          <SingleCourse  match = {match} />
-                        </div>
-                        /* idPaciente = {parseInt(match.params.idPaciente)} */
-                      )
-                    }
-                    
-                  }}/>
+                  
                   
                   <Route path="/admin/cursos/nuevo" render={()=>{
                     return (

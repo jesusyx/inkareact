@@ -4,6 +4,9 @@ import { db } from '../../firebase.js'
 import { Link } from 'react-router-dom'
 const { Meta } = Card;
 
+
+
+
 class AllCourses extends Component {
     constructor(props){
         super(props);
@@ -23,13 +26,13 @@ class AllCourses extends Component {
         })
     }
     render() {
-        {this.state.cursos.map( doc => console.log(doc.data()))}
+        {this.state.cursos.map( doc => console.log(doc.id,'DOC.DATA() as well'))}
         return(
            <Layout.Content style={{ margin: '24px 16px 0', overflow: 'initial' }}>
                 <div style={{ padding: 24, background: '#fff', textAlign: 'center', display:'flex', justifyContent:'space-around', flexWrap:'wrap'}}>
-                    {this.state.cursos.map(doc => (
+                    {this.state.cursos.map((doc,key) => (
 
-                        <Link to={`/admin/cursos/${doc.id}`}>
+                        <Link key={key} to={`/admin/cursos/${doc.id}/archivos`}>
                             <Card
                                 hoverable
                                 style={{ width: 240, marginBottom: '1rem', margin:'0 0.5rem 1rem 0.5rem' }}

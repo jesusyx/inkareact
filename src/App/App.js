@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import HomeApp from '../HomeApp/HomeApp';
 import Login from '../Login/Login';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import './App.css'
-import { db, auth } from '../firebase.js'
+import { BrowserRouter as Router, Route, Redirect  } from 'react-router-dom';
+import { db, auth, localauth } from '../firebase.js'
+import ClientSide from '../ClientSide/ClientSide'
 
 
 
@@ -11,7 +11,8 @@ class App extends Component {
     constructor(){
         super();
         this.state = { 
-            user:null
+            user:null,
+            isSingIn:false
         }
 
         this.handleOnCreateEmail = this.handleOnCreateEmail.bind(this);
@@ -20,15 +21,19 @@ class App extends Component {
         
     }
     componentDidMount () {
+        
 
 		auth.onAuthStateChanged( user => {
 			if (user) {
-				this.setState({ user:user })
+                this.setState({ isSingIn:true, user:user })
+                
+                
 			} else {
-				this.setState({user:null})
+                this.setState({ isSingIn:false, user:null })
 			}
 		})
 
+        
         //crear una referencia a una coleccion
         /*
             const usuariosref = db.collection("usuarios").doc();
@@ -62,7 +67,8 @@ class App extends Component {
 		.then( result =>{
             db.collection("usuarios").add({
                 nombre,
-                email
+                email,
+                uA:0
             })
             .then(function(docRef) {
                 console.log("Document written with ID: ", docRef.id);
@@ -85,16 +91,24 @@ class App extends Component {
 
 		let email = event.target.email.value;
 		let password = event.target.password.value;
-		//console.log("emila y password", email,password)
-		auth.signInWithEmailAndPassword(email, password)
-		.then( result => {console.log("resultado:",result)})
+        //console.log("emila y password", email,password)
+        
+        auth.setPersistence(localauth.Auth.Persistence.LOCAL)
+        .then(function() {
+            // Existing and future Auth states are now persisted in the current
+            // session only. Closing the window would clear any existing state even
+            // if a user forgets to sign out.
+            // ...
+            // New sign-in will be persisted with session persistence.
+            return auth.signInWithEmailAndPassword(email, password)
+        })
+        .catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+        });
 
-		.catch( error => {
-            let errorCode = error.code;
-            let errorMessage = error.message;
-            console.log("Un error ah ocurrido", errorCode, errorMessage)
-            alert("Email o contraseña incorrectos.")
-		});
+		
     }
     handleLogout () {
 		auth.signOut()
@@ -104,11 +118,12 @@ class App extends Component {
 
     render() {
         console.log('ESTADO USER:',this.state.user)
+        /*REDIRECT TO LOGIN. CRETE ROUTE TO LOGIN AND... IS STATEUSER = NULL .. USE REDIRECT TO /LOGIN*/
         return(
             <Router>
                 <div>
-                <Route path="/admin" render={()=>{
-                    if (this.state.user){
+                <Route path="/admin" render={({match})=>{
+                    if (this.state.isSingIn && this.state.user.email == 'jesusyx22@gmail.com' ){
                         return (
                             <HomeApp
                                 user = {this.state.user}
@@ -120,16 +135,21 @@ class App extends Component {
                             <Login
                                 handleOnCreateEmail = {this.handleOnCreateEmail}
                                 handleOnAuthEmail = {this.handleOnAuthEmail}
+                                match = {match}
 
                             />
                         )
                     }
                 }}/>
-                <Route exact path="/" render={() => {
-                    if (this.state.user){
+                <Route path="/cursos" render={({match}) => {
+                    if (this.state.isSingIn){
                         return (
                             <div>
-                                <h1>Client Side</h1>
+                                
+                                <ClientSide
+                                    userEmail={this.state.user.email}
+                                    match = {match}
+                                />
                             </div>
                         )
                     } else {
@@ -137,9 +157,16 @@ class App extends Component {
                             <Login
                                 handleOnCreateEmail = {this.handleOnCreateEmail}
                                 handleOnAuthEmail = {this.handleOnAuthEmail}
+                                match = {match}
                             />
                         )
                     }
+                }}/>
+                <Route exact path="/" render={({match}) => {
+                    return(
+                        <Redirect to="/cursos" />
+                    )
+                    
                 }}/>
                 </div>
             </Router>

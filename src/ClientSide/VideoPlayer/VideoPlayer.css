@@ -1,0 +1,13 @@
+ul.video {
+    padding-left: 0;
+}
+li.video {
+    list-style: none;
+    padding: 0.5rem;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+li p.video {
+   margin-bottom: 0;
+   margin-left: 1.5rem;
+}
