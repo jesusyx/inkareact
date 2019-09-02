@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { List,  Layout, PageHeader, Button, Icon, Menu } from 'antd';
+import { List,  Layout, PageHeader, Button, Icon, Menu, Spin } from 'antd';
 import { Link } from 'react-router-dom';
 import { db } from '../../firebase.js'
 
@@ -22,7 +22,8 @@ class Archivos extends Component {
         this.state = {
             /* archivos:[], */
             videos:[],
-            cursoName:''
+            cursoName:'',
+            isFetched:false
         }
     }
     componentDidMount() {
@@ -48,7 +49,8 @@ class Archivos extends Component {
                 db.collection("Cursos").doc(this.props.match.params.idcurso).collection('Archivos').doc(archivo.id).collection('videos').orderBy("timestamp", "asc").get()
                 .then( querySnapshotforVideos =>{
                     this.setState({
-                        videos:[...this.state.videos, {doc:querySnapshotforVideos.docs, seccion: archivo.data().seccionName, id:archivo.id}]
+                        videos:[...this.state.videos, {doc:querySnapshotforVideos.docs, seccion: archivo.data().seccionName, id:archivo.id}],
+                        isFetched:true
                     })
                     
                 })
@@ -77,7 +79,7 @@ class Archivos extends Component {
                 />
                 
                 <Layout.Content style={{ margin: '24px 16px 0', overflow: 'initial', marginBottom:'1rem' }}>
-                    {this.state.videos.map( (archivo,key) => {
+                    {this.state.isFetched ? this.state.videos.map( (archivo,key) => {
                         return(
                             <div key={key}>
                                 <PageHeader   title={archivo.seccion}
@@ -111,7 +113,8 @@ class Archivos extends Component {
                             </div>
 
                         )
-                    })}
+                    })
+                :<Spin size="large" style={{display:'flex', justifyContent:'center', alignItems:'center'}} />}
                     
                     <br/>
                 </Layout.Content>

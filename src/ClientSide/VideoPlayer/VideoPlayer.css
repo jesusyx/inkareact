@@ -6,8 +6,27 @@ li.video {
     padding: 0.5rem;
     background: #fff;
     border: 1px solid #ccc;
+    cursor: pointer;
 }
 li p.video {
    margin-bottom: 0;
    margin-left: 1.5rem;
+}
+
+/* .videoxd .video {
+    width: 100%;
+    height: 100vh;
+    background: #000;
+    
+} */
+
+div.videoplayerxd {
+    background: #000 !important;
+    padding-top: calc( 100vh - 64px ) !important;
+}
+
+div.videoplayerxd button.video-react-big-play-button {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
 }

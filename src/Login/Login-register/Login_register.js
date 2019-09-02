@@ -31,6 +31,19 @@ class NormalLoginFormRegister extends React.Component {
               )}
             </Form.Item>
             <Form.Item>
+              {getFieldDecorator('lastname', {
+                rules: [{ required: true, message: 'Por favor ingresa tus apellidos!' }],
+              })(
+                <Input
+                  prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                  placeholder="Apellidos"
+                  name="apellidos"
+                />,
+              )}
+            </Form.Item>
+
+
+            <Form.Item>
               {getFieldDecorator('email', {
                 rules: [{ required: true, message: 'Por favor ingresa tu email!' }],
               })(

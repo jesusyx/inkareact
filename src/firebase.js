@@ -15,7 +15,7 @@ const firebaseConfig = {
   
   firebase.initializeApp(firebaseConfig);
   
-  firebase.firestore().settings({
+   firebase.firestore().settings({
     cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
   });
   firebase.firestore().enablePersistence()
@@ -37,11 +37,10 @@ const firebaseConfig = {
   
 
   const auth = firebase.auth();
-  const localauth = firebase.auth
 
   const storage = firebase.storage();
   const currentTime = firebase.firestore
   
 
 
-  export { db, auth, storage, currentTime, localauth };
+  export { db, auth, storage, currentTime };

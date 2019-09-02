@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Layout, Form, Icon, Input, Button, Select } from 'antd';
-import { db, auth } from '../../firebase.js'
+import { db, auth, currentTime } from '../../firebase.js'
+import uuid from 'uuid'
 
 const { Option } = Select;
 
@@ -26,7 +27,9 @@ class NormalNewUserForm extends Component {
 
         auth.createUserWithEmailAndPassword(email, password)
 		.then( result =>{
-            db.collection("AdmUsuarios").add({
+            db.collection("usuarios").add({
+                key:uuid.v4(),
+                timestamp:currentTime.FieldValue.serverTimestamp(),
                 nombre,
                 apellidos,
                 email,
@@ -38,7 +41,8 @@ class NormalNewUserForm extends Component {
             .catch(function(error) {
                 console.error("Error adding document: ", error);
             });
-			console.log(result,"result NewUserForm.js")
+            console.log(result,"result NewUserForm.js")
+            
 		})
 		.catch(function(error) {
   		let errorCode = error.code;
@@ -159,6 +163,7 @@ class NormalNewUserForm extends Component {
                     </Form>
                 </div>
             </Layout.Content>
+            
         )
     }
 }

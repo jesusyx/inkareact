@@ -1,13 +1,27 @@
 import React, { Component } from 'react'
-import { Layout, Form, Icon, Input, Button,  Card } from 'antd';
+import { Layout, Form, Icon, Input, Button,  Card, message, notification, Progress  } from 'antd';
+import uuid from 'uuid'
+import { db, storage, currentTime } from '../../firebase.js'
 
-import { db, storage } from '../../firebase.js'
+
+const success = () => {
+    message.success('Curso Agregado');
+};
+const error = () => {
+    message.error('Un Error ah ocurrido');
+};
+
+const openNotificationWithIcon = type => {
+    notification[type]({
+      message: 'Subido Correctamente',
+    });
+  };
 
 class NormalNuevoCursoForm extends Component {
     constructor(){
         super();
         this.state = {
-            picture:null,
+            picture:'https://olc-wordpress-assets.s3.amazonaws.com/uploads/2018/06/Instructional-Design-Courses-and-Programs-01.jpg',
             uploadValue:0,
         }
 
@@ -15,6 +29,8 @@ class NormalNuevoCursoForm extends Component {
         this.handleUpload = this.handleUpload.bind(this)
         
     }
+
+    
 
 
     normFile = e => {
@@ -27,8 +43,8 @@ class NormalNuevoCursoForm extends Component {
 
 
     handleUpload (event) {
-        const file = event.target.files[0];
-        const storageRef = storage.ref(`/coursesPic/${file.name}`);
+        const file = event.target.files[0] || uuid.v4();
+        const storageRef = storage.ref(`/coursesPic/${file.name}${uuid.v4()}`);
         const task = storageRef.put(file);
         
         task.on('state_changed', snapshot => {
@@ -37,13 +53,16 @@ class NormalNuevoCursoForm extends Component {
               uploadValue:percentage
             })
             
-        },(error) => {console.log(error.message)
+        },(err) => { 
+            error();
+            console.log(err,'error al subir')
 
         }, () => {
             task.snapshot.ref.getDownloadURL().then( DownloadURL => {
                 this.setState({
-                    picture:DownloadURL
+                    picture:DownloadURL,
                 })
+                openNotificationWithIcon('success');
             })
         });  
     }
@@ -56,12 +75,21 @@ class NormalNuevoCursoForm extends Component {
         let picture = this.state.picture;
             
         db.collection("Cursos").add({
+            timestamp:currentTime.FieldValue.serverTimestamp(),
             title,
             subtitle,
             picture
         })
-        .then(function(docRef) {
+        .then((docRef) => {
+
+            this.props.form.resetFields()
             console.log("Document written with ID: ", docRef.id);
+            success();
+            this.setState({
+                picture:'https://olc-wordpress-assets.s3.amazonaws.com/uploads/2018/06/Instructional-Design-Courses-and-Programs-01.jpg',
+                uploadValue:0,
+            })
+            
         })
         .catch(function(error) {
             console.error("Error adding document: ", error);
@@ -119,8 +147,10 @@ class NormalNuevoCursoForm extends Component {
                     >
                         {getFieldDecorator('curso_title', {
                             rules: [{ required: true, message: 'Por favor ingresa un nombre para el curso!', whitespace: true }],
-                        })(<Input type="text" name="title" />)}
+                        })(<Input  type="text" name="title" />)}
                     </Form.Item>
+
+
                     <Form.Item
                         label={
                             <span>
@@ -129,23 +159,24 @@ class NormalNuevoCursoForm extends Component {
                         }
                     >
                         {getFieldDecorator('curso_subtitle', {
-                            rules: [{ required: true, message: 'Por favor ingresa un subtitulo!', whitespace: true }],
-                        })(<Input type="text" name="subtitle" />)}
+                            rules: [{ required: true, message: 'Por favor ingresa un subtitulo!', whitespace: true, initialValue:this.state.subtitle }],
+                        })(<Input  type="text" name="subtitle" />)}
                     </Form.Item>
 
                     <Form.Item label="Subir Imagen">
-                            <label class="custom-file-upload" style={{ border: '1px solid #ccc', display: 'inline-block', padding: '0px 4px', cursor:'pointer', marginBottom:'1rem'}}>
+                            <label className="custom-file-upload" style={{ border: '1px solid #ccc', display: 'inline-block', padding: '0px 4px', cursor:'pointer', marginBottom:'1rem'}}>
                                 <input type="file" name="picture" onChange={this.handleUpload} style={{display:'none'}} />
                                 Seleccionar imagen
                             </label>
                             
                                
-                        <Card
+                        <Card   
                                 hoverable
                                 style={{ width: 240, marginBottom: '1rem', margin:'0 0.5rem 1rem 0.5rem', margin:'0 auto'}}
-                                cover={<img alt="example" src={this.state.picture ? this.state.picture: "https://olc-wordpress-assets.s3.amazonaws.com/uploads/2018/06/Instructional-Design-Courses-and-Programs-01.jpg"} />}
+                                cover={<img alt="example" style={{ height:'238px', width:'238px', objectFit:'cover', objectPosition:'center' }} src={this.state.picture} />}
                             >
-                                <progress value={this.state.uploadValue} max='100'/>
+                                
+                                <Progress percent={Math.round(this.state.uploadValue)} max='100'/>
                         </Card>
                         
                         {/* getFieldDecorator('upload', {

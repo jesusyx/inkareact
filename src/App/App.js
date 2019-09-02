@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import HomeApp from '../HomeApp/HomeApp';
 import Login from '../Login/Login';
 import { BrowserRouter as Router, Route, Redirect  } from 'react-router-dom';
-import { db, auth, localauth } from '../firebase.js'
+import { db, auth,  currentTime } from '../firebase.js'
 import ClientSide from '../ClientSide/ClientSide'
+import uuid from 'uuid'
 
 
 
@@ -12,7 +13,8 @@ class App extends Component {
         super();
         this.state = { 
             user:null,
-            isSingIn:false
+            isSingIn:false,
+            
         }
 
         this.handleOnCreateEmail = this.handleOnCreateEmail.bind(this);
@@ -26,36 +28,28 @@ class App extends Component {
 		auth.onAuthStateChanged( user => {
 			if (user) {
                 this.setState({ isSingIn:true, user:user })
+
+
+                /* db.collection('usuarios').where('email', '==', user.email).get()
+                .then(snapshot => snapshot.forEach(doc => {
+                    console.log(doc.data().email, doc.id, 'USUARIO ACTUAL')
+                    this.setState({
+                        currentUserId:doc.id
+                    })
+                })) */
                 
                 
 			} else {
                 this.setState({ isSingIn:false, user:null })
 			}
 		})
-
-        
-        //crear una referencia a una coleccion
-        /*
-            const usuariosref = db.collection("usuarios").doc();
-            usuariosref.set(data)
-        */
-
-
-		/* const usersRef = firebase.database().ref().child('users');
-
-		usersRef.on('child_added', snapshot => {
-
-			this.setState({
-				users:this.state.users.concat(snapshot.val()),
-			})
-		}) */
-
 	}
     
     handleOnCreateEmail(event) {
         event.preventDefault();
 		
-		let nombre = event.target.nombre.value;
+        let nombre = event.target.nombre.value;
+        let apellidos = event.target.apellidos.value;
 		let email = event.target.email.value;
         let password = event.target.password.value;
         
@@ -66,9 +60,13 @@ class App extends Component {
 		auth.createUserWithEmailAndPassword(email, password)
 		.then( result =>{
             db.collection("usuarios").add({
+                key:uuid.v4(),
+                timestamp:currentTime.FieldValue.serverTimestamp(),
                 nombre,
+                apellidos,
                 email,
-                uA:0
+                rol:'estudiante'
+                
             })
             .then(function(docRef) {
                 console.log("Document written with ID: ", docRef.id);
@@ -91,22 +89,8 @@ class App extends Component {
 
 		let email = event.target.email.value;
 		let password = event.target.password.value;
-        //console.log("emila y password", email,password)
-        
-        auth.setPersistence(localauth.Auth.Persistence.LOCAL)
-        .then(function() {
-            // Existing and future Auth states are now persisted in the current
-            // session only. Closing the window would clear any existing state even
-            // if a user forgets to sign out.
-            // ...
-            // New sign-in will be persisted with session persistence.
-            return auth.signInWithEmailAndPassword(email, password)
-        })
-        .catch(function(error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-        });
+
+        auth.signInWithEmailAndPassword(email, password)
 
 		
     }
@@ -118,12 +102,12 @@ class App extends Component {
 
     render() {
         console.log('ESTADO USER:',this.state.user)
-        /*REDIRECT TO LOGIN. CRETE ROUTE TO LOGIN AND... IS STATEUSER = NULL .. USE REDIRECT TO /LOGIN*/
+        /* EL User .. solo se usa para obtener datos o reemplazar .. no se usa para guardarlo todo */
         return(
             <Router>
                 <div>
                 <Route path="/admin" render={({match})=>{
-                    if (this.state.isSingIn && this.state.user.email == 'jesusyx22@gmail.com' ){
+                    if (this.state.isSingIn && this.state.user.uid == 'uwG06tfXmVQ3vXDYU8Ksbzyu2Wf1' ){
                         return (
                             <HomeApp
                                 user = {this.state.user}
@@ -148,7 +132,9 @@ class App extends Component {
                                 
                                 <ClientSide
                                     userEmail={this.state.user.email}
+                                    
                                     match = {match}
+                                    handleLogout = {this.handleLogout}
                                 />
                             </div>
                         )

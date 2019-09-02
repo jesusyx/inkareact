@@ -54,7 +54,8 @@ class NormalLoginForm extends React.Component {
               <Button type="primary" htmlType="submit" className="login-form-button">
                 Log in
               </Button>
-              {this.props.match.url == '/admin' ? null : <span>O <a onClick={this.props.logintoggle}>Registrarse ahora!</a></span> }
+              {/* this.props.match.url == '/admin' ? null : <span>O <a onClick={this.props.logintoggle}>Registrarse ahora!</a></span>  */}
+              
             </Form.Item>
           </Form>
       </Fragment>

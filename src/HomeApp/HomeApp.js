@@ -8,6 +8,7 @@ import AllUsers from './AllUsers/AllUsers'
 import NewUserForm from './NewUserForm/NewUserForm'
 import CourseFiles from './CourseFiles/CourseFiles'
 import NuevoCursoForm from './NuevoCursoForm/NuevoCursoForm'
+import UserDetails from './UserDetails'
 
 
 
@@ -216,6 +217,18 @@ class HomeApp extends Component {
                         <NewUserForm/>
                       </div>
                     )
+                  }}/>
+
+                  <Route path="/admin/usuarios/:idusuario" render={({match})=>{
+                    if (match.url=="/admin/usuarios/nuevo") {
+                      return;
+                    }else{
+                    return (
+                      <UserDetails
+                        match = {match}
+                      />
+                    )
+                  }
                   }}/>
                 
               <Footer style={{ textAlign: 'center', background:'#fff' }}>Ant Design ©2018 Created by Ant UED</Footer>

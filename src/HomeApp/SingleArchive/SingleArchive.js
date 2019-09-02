@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
-import { Layout, Form, Icon, Input, Button,  Card } from 'antd';
-
+import { Layout, Form, Input, Button,  Card, Progress } from 'antd';
+import uuid from 'uuid'
 import { db, storage, currentTime } from '../../firebase.js'
 
 class NormalSingleArchive extends Component {
     constructor(){
         super();
         this.state = {
-            video:null,
+            video:'',
             uploadValue:0,
         }
 
@@ -25,7 +25,7 @@ class NormalSingleArchive extends Component {
 
     handleUpload (event) {
         const file = event.target.files[0];
-        const storageRef = storage.ref(`/Videos/${file.name}`);
+        const storageRef = storage.ref(`/Videos/${file.name}${uuid.v4()}`);
         const task = storageRef.put(file);
         
         task.on('state_changed', snapshot => {
@@ -53,9 +53,10 @@ class NormalSingleArchive extends Component {
         let video = this.state.video;
 
         db.collection("Cursos").doc(this.props.match.params.idcurso).collection('Archivos').doc(this.props.match.params.idseccion).collection('videos').add({
+            timestamp:currentTime.FieldValue.serverTimestamp(),
             title,
             video,
-            timestamp:currentTime.FieldValue.serverTimestamp()
+            
         })
         .then(function(docRef) {
             console.log("Document written with ID: ", docRef.id);
@@ -133,7 +134,8 @@ class NormalSingleArchive extends Component {
                                         <source src={ this.state.video ? this.state.video : null } type="video/mp4"/>
                                     </video>}
                             >
-                                <progress value={this.state.uploadValue} max='100'/>
+                                
+                                <Progress percent={Math.round(this.state.uploadValue)} max='100'/>
                         </Card>
 
                     </Form.Item>
