@@ -1,9 +1,15 @@
 import React, { Component } from 'react'
-import { Layout, Form, Icon, Input, Button, Select } from 'antd';
+import { Layout, Form, Icon, Input, Button, Select, notification } from 'antd';
 import { db, auth, currentTime } from '../../firebase.js'
 import uuid from 'uuid'
 
 const { Option } = Select;
+const openNotificationWithIcon = type => {
+    notification[type]({
+      message: 'Usuario Creado',
+    });
+  };
+
 
 class NormalNewUserForm extends Component {
     constructor(){
@@ -27,6 +33,7 @@ class NormalNewUserForm extends Component {
 
         auth.createUserWithEmailAndPassword(email, password)
 		.then( result =>{
+            openNotificationWithIcon('success')
             db.collection("usuarios").add({
                 key:uuid.v4(),
                 timestamp:currentTime.FieldValue.serverTimestamp(),

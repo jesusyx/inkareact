@@ -1,7 +1,23 @@
 import React, { Component } from 'react'
-import { Layout, Form, Input, Button,  Card, Progress } from 'antd';
+import { Layout, Form, Input, Button,  Card, Progress, message, notification } from 'antd';
 import uuid from 'uuid'
 import { db, storage, currentTime } from '../../firebase.js'
+
+
+const success1 = () => {
+    message.success('Archivo Creado');
+};
+
+const error2 = () => {
+    message.error('Un Error ah ocurrido');
+};
+
+const openNotificationWithIcon = type => {
+    notification[type]({
+      message: 'Subido Correctamente',
+    });
+  };
+
 
 class NormalSingleArchive extends Component {
     constructor(){
@@ -34,14 +50,14 @@ class NormalSingleArchive extends Component {
               uploadValue:percentage
             })
             
-        },(error) => {console.log(error.message)
+        },(error) => {console.log(error.message); error2();
 
         }, () => {
             task.snapshot.ref.getDownloadURL().then( DownloadURL => {
                 this.setState({
                     video:DownloadURL
                 })
-                alert("Video Subido")
+                openNotificationWithIcon('success');
             })
         });  
     }
@@ -58,11 +74,13 @@ class NormalSingleArchive extends Component {
             video,
             
         })
-        .then(function(docRef) {
+        .then((docRef) => {
+            this.props.form.resetFields()
+            success1();
             console.log("Document written with ID: ", docRef.id);
         })
-        .catch(function(error) {
-            console.error("Error adding document: ", error);
+        .catch((error) => {
+            error2();
         });
     }
     render(){

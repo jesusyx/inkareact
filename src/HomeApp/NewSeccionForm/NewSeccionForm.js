@@ -1,11 +1,24 @@
 import React, { Component } from 'react'
-import { Layout, PageHeader, Button, Form, Input } from 'antd';
+import { Layout, PageHeader, Button, Form, Input, message, notification, } from 'antd';
 import { db, currentTime } from '../../firebase.js'
 
+const success = () => {
+    message.success('Seccion Creada');
+};
+const error = () => {
+    message.error('Un Error ah ocurrido');
+};
 
+const openNotificationWithIcon = type => {
+    notification[type]({
+      message: 'Subido Correctamente',
+    });
+  };
+
+  
 class NormalNewSeccionForm extends Component {
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.handlenewSeccion = this.handlenewSeccion.bind(this)
     }
 
@@ -18,8 +31,10 @@ class NormalNewSeccionForm extends Component {
             seccionName:nombre,
             timestamp:currentTime.FieldValue.serverTimestamp()
         })
-        .then(function(docRef) {
+        .then((docRef) => {
             console.log("Document written with ID: ", docRef.id);
+            this.props.form.resetFields()
+            success();
         })
         .catch(function(error) {
             console.error("Error adding document: ", error);
@@ -68,8 +83,8 @@ class NormalNewSeccionForm extends Component {
                                 </span>
                             }
                         >
-                            {getFieldDecorator('user_name', {
-                                rules: [{ required: true, message: 'Por favor ingresa tu nombre', whitespace: true }],
+                            {getFieldDecorator('seccion_name', {
+                                rules: [{ required: true, message: 'Por favor ingresa un nombre', whitespace: true }],
                             })(<Input type="text" name="nombre" />)}
                         </Form.Item>
                         <Form.Item {...tailFormItemLayout}>
@@ -84,5 +99,5 @@ class NormalNewSeccionForm extends Component {
         )
     }
 }
-const NewSeccionForm = Form.create({ name: 'NuevoUsuario' })(NormalNewSeccionForm);
+const NewSeccionForm = Form.create({ name: 'NuevoSeccion' })(NormalNewSeccionForm);
 export default NewSeccionForm

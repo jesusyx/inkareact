@@ -41,13 +41,14 @@ class UserDetails extends Component {
         this.onFocus = this.onFocus.bind(this)
         this.onSearch = this.onSearch.bind(this)
         this.handleSendCourses = this.handleSendCourses.bind(this)
+        this.handleDeleteDoc = this.handleDeleteDoc.bind(this)
     }
 
     handleSendCourses(event){
         
         event.preventDefault();
         if (this.state.currentCourseFocus != ''){
-            this.state.coursesRef=[]
+            /* this.state.coursesRef=[] */
 
 
 
@@ -91,6 +92,14 @@ class UserDetails extends Component {
     onSearch(val) {
         console.log('search:', val);
     }
+
+    handleDeleteDoc(uid) {
+        db.collection('usuarios').where('key', '==', this.props.match.params.idusuario).get()
+        .then( querySnapshot => {
+            db.collection('usuarios').doc(querySnapshot.docs[0].id).collection('owncourses')
+            .doc(uid).delete()
+        });
+    }
     
     componentDidMount(){
         db.collection('usuarios').where('key', '==', this.props.match.params.idusuario).get()
@@ -115,39 +124,15 @@ class UserDetails extends Component {
 
         db.collection('usuarios').where('key', '==', this.props.match.params.idusuario).get()
         .then( querySnapshot => {
-            querySnapshot.forEach( doc => {
-                db.collection('usuarios').doc(doc.id).collection('owncourses')
+            db.collection('usuarios').doc(querySnapshot.docs[0].id).collection('owncourses')
                 .onSnapshot((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        this.setState({
-                            coursesRef:[...this.state.coursesRef, doc.data().course],
-                            isFetched2:true
-                        })
-        
-                        /* db.collection('Cursos').where('title', '==', doc.data().course).get()
-                        .then(snapshot3 => {
-                            snapshot3.forEach( doc => {
-                                console.log(doc.id, doc.data(),'ID Y DATAA')
-                                this.setState({
-                                    coursesData:[...this.state.coursesData , doc.data()]
-                                })
-                            })
-                        }) */
-                    });
+                    this.setState({
+                        coursesRef:querySnapshot.docs,
+                        isFetched2:true
+                    })
                 });
-            })
         });
         
-        
-
-
-        
-
-
-        
-
-
-
         /* db.collection('usuarios').where('key', '==', this.props.match.params.idusuario).collection('owncourses').get()
         .then( snapshot => {
             if (snapshot.empty) {
@@ -158,8 +143,6 @@ class UserDetails extends Component {
         }).catch((error) =>{
             console.log("Error getting documents: ", error);
         }) */
-
-
 
         db.collection('Cursos').get()
         .then(querySnapshot => {
@@ -172,6 +155,9 @@ class UserDetails extends Component {
         })
        
     }
+
+
+    
     render() {
         console.log(this.state.usercourses,'usercourses')
         console.log(this.state.currentCourseFocus,'currentCOursefOCUS')
@@ -208,7 +194,7 @@ class UserDetails extends Component {
                         <Select
                             showSearch
                             style={{ width: '80%' }}
-                            placeholder="Select a person"
+                            placeholder="Seleccionar Curso"
                             optionFilterProp="children"
                             onChange={this.onChange}
                             onFocus={this.onFocus}
@@ -232,11 +218,18 @@ class UserDetails extends Component {
                       <List
                         itemLayout="horizontal"
                         dataSource={this.state.coursesRef}
+                        
                         renderItem={item => (
-                        <List.Item>
+                        <List.Item style={{margin:'0 5%'}}>
                             <List.Item.Meta
+                            style={{display:'flex', alignItems:'center'}}
                             avatar={<Avatar src="https://olc-wordpress-assets.s3.amazonaws.com/uploads/2018/06/Instructional-Design-Courses-and-Programs-01.jpg" />}
-                            title={<a href="#">{item}</a>}
+                            title={<span style={{ display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                                    <a href='#'>
+                                        {item.data().course}
+                                    </a>
+                                        <Icon onClick={() => this.handleDeleteDoc(item.id)} style={{marginRight:'15%'}} type="delete" key="delete" theme="twoTone" twoToneColor="#eb2f96"/>
+                                    </span>}
                             /* description="Ant Design, a design language for background applications, is refined by Ant UED Team" */
                             />
                         </List.Item>
